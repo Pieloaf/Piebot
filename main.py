@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
 import os
+import json
+from const import bakerRole, serverId
 
 TOKEN = 'NzQ2MDMyNTM4Mzk2NTI0NjE2.Xz6a8Q.ADF0Lt5AizkTu8g61MdEcL9aRe4'
 bot = commands.Bot(command_prefix='+', help_command=None)
@@ -20,6 +22,19 @@ async def on_ready():
         if filename.endswith('.py') and not filename.startswith('const'):
             bot.load_extension(f'cogs.{filename[:-3]}')
             print(f'loaded {filename}')
+
+    guild = bot.get_guild(serverId)
+    baker = guild.get_role(bakerRole)
+
+    with open('./config.json', 'r') as json_file:
+        data = json.load(json_file)
+
+    ruleMessage = await bot.get_channel(data["rules"]["channel"]
+                                        ).fetch_message(data["rules"]["id"])
+    reactedUsers = await ruleMessage.reactions[0].users().flatten()
+    noBaker = [user for user in reactedUsers if baker not in user.roles]
+    for user in noBaker:
+        await user.add_roles(baker)
 
 
 @bot.command()

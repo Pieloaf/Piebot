@@ -1,5 +1,6 @@
 serverId = 745617109589164123
 bakerRole = 745665065046376478
+pieloaf = 439364864763363363
 
 ModChannels = {
     "warnings": 745776305685004469,
@@ -15,4 +16,5 @@ warningMessage = "This is your first and only warning. Please refrain from using
 warningReport = "User: `{}` has recieved their first warning as result of sending message: `{}`"
 secondWarning = "This is your second time using offensive language. You have been already been warned about this."
 secondWarningReport = "User: `{}` has recieved their **another warning** as result of sending message: `{}`"
-liveMessage = "@everyone Heyo you person, **{}** is now live at {}. Go check it out!"
+liveMessage = "Hey you, person! **{}** is now live at {}. Go check them out!"
+pieLive = "Hey @everyone Pieloaf is now live! https://twitch.tv/pieloaf. Go check it out!"

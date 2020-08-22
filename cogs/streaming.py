@@ -1,37 +1,56 @@
 from discord.ext import commands
 import discord
 import json
-from const import OtherChannels, liveMessage, serverId
+from const import OtherChannels, liveMessage, serverId, pieLive, pieloaf
+from datetime import datetime, timedelta
 
 
 class Streaming(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.onCoolDown = []
 
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
-        if not [
-                activity for activity in before.activities
-                if activity.type == discord.ActivityType.streaming
-        ] and [
-                activity for activity in after.activities
-                if activity.type == discord.ActivityType.streaming
-        ]:
-            streamAct = [
-                activity for activity in after.activities
-                if activity.type == discord.ActivityType.streaming
+        afterStreamingAct = [
+            activity for activity in after.activities
+            if activity.type == discord.ActivityType.streaming
+        ]
+
+        beforeStreamingAct = [
+            activity for activity in before.activities
+            if activity.type == discord.ActivityType.streaming
+        ]
+
+        if not beforeStreamingAct and afterStreamingAct:
+
+            isOnCoolDown = [
+                item for item in self.onCoolDown if item[0] == after.id
             ]
 
-            if streamAct[0].platform == 'Twitch':
-                streamEmbed = await self.streamNotify(streamAct=streamAct[0],
-                                                      after=after)
-                await self.bot.get_channel(OtherChannels['goingLive']).send(
-                    content=liveMessage.format(streamAct[0].twitch_name,
-                                               streamAct[0].url),
-                    embed=streamEmbed)
+            if isOnCoolDown:
+                item = isOnCoolDown[0]
+                if datetime.now < item[1]:
+                    return
+                else:
+                    self.onCoolDown.remove(item)
+
+            if after.id != pieloaf:
+                messageContent = liveMessage.format(
+                    afterStreamingAct[0].twitch_name, afterStreamingAct[0].url)
             else:
-                print(streamAct[0].platform)
-                print(type(streamAct[0].platform))
+                messageContent = pieLive
+
+            if afterStreamingAct[0].platform == 'Twitch':
+                streamEmbed = await self.streamNotify(
+                    streamAct=afterStreamingAct[0], after=after)
+                await self.bot.get_channel(OtherChannels['goingLive']
+                                           ).send(content=messageContent,
+                                                  embed=streamEmbed)
+
+        elif [beforeStreamingAct] and not [afterStreamingAct]:
+            self.onCoolDown.append(
+                (after.id, datetime.now + timedelta(minutes=30)))
 
     async def streamNotify(self, streamAct, after):
         embed = discord.Embed(colour=discord.Colour.from_rgb(145, 71, 255),
