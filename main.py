@@ -4,7 +4,7 @@ import os
 import json
 from const import bakerRole, serverId
 
-TOKEN = 'NzQ2MDMyNTM4Mzk2NTI0NjE2.Xz6a8Q.ADF0Lt5AizkTu8g61MdEcL9aRe4'
+TOKEN = 'Discord-Bot-Token-Here'
 bot = commands.Bot(command_prefix='+', help_command=None)
 
 activityName = "Just Vibin\'"
